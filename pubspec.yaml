@@ -11,7 +11,7 @@ dependencies:
   logging: ^1.2.0
   meta: ^1.10.0
   tuple: ^2.0.2
-  web_socket_channel: ^2.4.1
+  web_socket_channel: ^2.4.0
   equatable: ^2.0.5
   message_pack_dart: ^2.0.1
   async: ^2.11.0
