@@ -6,10 +6,10 @@ import 'package:http/http.dart' as http;
 import 'package:signalr_core/src/connection.dart';
 import 'package:signalr_core/src/http_connection_options.dart';
 import 'package:signalr_core/src/logger.dart';
+import 'package:signalr_core/src/transport.dart';
 import 'package:signalr_core/src/transports/long_polling_transport.dart';
 import 'package:signalr_core/src/transports/server_sent_events_transport.dart';
 import 'package:signalr_core/src/transports/web_socket_transport.dart';
-import 'package:signalr_core/src/transport.dart';
 import 'package:signalr_core/src/utils.dart';
 
 enum ConnectionState {
@@ -110,16 +110,16 @@ class HttpConnection implements Connection {
   @override
   String? connectionId;
   @override
-  OnReceive? onreceive;
+  OnReceive? onReceive;
   @override
-  OnClose? onclose;
+  OnClose? onClose;
 
   final int negotiateVersion = 1;
 
   HttpConnection({
     required String? url,
     required HttpConnectionOptions options,
-  })   : baseUrl = url,
+  })  : baseUrl = url,
         _client = (options.client != null)
             ? options.client
             : http.Client() as http.BaseClient,
@@ -128,8 +128,8 @@ class HttpConnection implements Connection {
     _connectionState = ConnectionState.disconnected;
     _connectionStarted = false;
 
-    onreceive = null;
-    onclose = null;
+    onReceive = null;
+    onClose = null;
   }
 
   @override
@@ -164,7 +164,7 @@ class HttpConnection implements Connection {
     } else if (_connectionState as dynamic != ConnectionState.connected) {
       // stop() was called and transitioned the client into the Disconnecting state.
       const message =
-          'HttpConnection.startInternal completed gracefully but didn\'t enter the connection into the connected state!';
+          "HttpConnection.startInternal completed gracefully but didn't enter the connection into the connected state!";
       _logging!(LogLevel.error, message);
       return Future.error(Exception(message));
     }
@@ -231,7 +231,7 @@ class HttpConnection implements Connection {
     //   _sendQueue = null;
     // }
 
-    // The transport's onclose will trigger stopConnection which will run our onclose event.
+    // The transport's onClose will trigger stopConnection which will run our onClose event.
     // The transport should always be set if currently connected. If it wasn't set, it's likely because
     // stop was called during start() and start() failed.
     if (_transport != null) {
@@ -276,7 +276,7 @@ class HttpConnection implements Connection {
 
     if (_connectionState == ConnectionState.disconnecting) {
       // A call to stop() induced this call to stopConnection and needs to be completed.
-      // Any stop() awaiters will be scheduled to continue after the onclose callback fires.
+      // Any stop() awaits will be scheduled to continue after the onClose callback fires.
       _stopCompleter.complete();
     }
 
@@ -299,12 +299,12 @@ class HttpConnection implements Connection {
     if (_connectionStarted) {
       _connectionStarted = false;
       try {
-        if (onclose != null) {
-          onclose!(_exception);
+        if (onClose != null) {
+          onClose!(_exception);
         }
       } catch (e) {
         _logging!(LogLevel.error,
-            'HttpConnection.onclose(${_exception.toString()}) threw error \'${e.toString()}\'.');
+            'HttpConnection.onClose(${_exception.toString()}) threw error \'${e.toString()}\'.');
       }
     }
   }
@@ -402,7 +402,7 @@ class HttpConnection implements Connection {
         headers['Authorization'] = 'Bearer $token';
       }
     }
-    
+
     if (_options.customHeaders != null) {
       headers.addAll(_options.customHeaders!);
     }
@@ -457,8 +457,8 @@ class HttpConnection implements Connection {
   Future<void> _startTransport({String? url, TransferFormat? transferFormat}) {
     if (_transport != null) {
       _transport!
-        ..onreceive = onreceive
-        ..onclose = (e) => _stopConnection(exception: e);
+        ..onReceive = onReceive
+        ..onClose = (e) => _stopConnection(exception: e);
       return _transport!.connect(url, transferFormat);
     } else {
       return Future.value();

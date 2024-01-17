@@ -80,8 +80,11 @@ abstract class HubMessage {
 
 /// Defines properties common to all Hub messages relating to a specific invocation.
 abstract class HubInvocationMessage extends HubMessage {
-  HubInvocationMessage({MessageType? type, this.headers, this.invocationId})
-      : super(type: type);
+  HubInvocationMessage({
+    MessageType? type,
+    this.headers,
+    this.invocationId,
+  }) : super(type: type);
 
   /// A [MessageHeaders] dictionary containing headers attached to the message.
   final Map<String, String>? headers;
@@ -95,13 +98,13 @@ abstract class HubInvocationMessage extends HubMessage {
 
 /// A hub message representing a non-streaming invocation.
 class InvocationMessage extends HubInvocationMessage {
-  InvocationMessage(
-      {this.target,
-      this.arguments,
-      this.streamIds,
-      Map<String, String>? headers,
-      String? invocationId})
-      : super(
+  InvocationMessage({
+    this.target,
+    this.arguments,
+    this.streamIds,
+    Map<String, String>? headers,
+    String? invocationId,
+  }) : super(
             type: MessageType.invocation,
             headers: headers,
             invocationId: invocationId);
@@ -118,13 +121,13 @@ class InvocationMessage extends HubInvocationMessage {
 
 /// A hub message representing a streaming invocation.
 class StreamInvocationMessage extends HubInvocationMessage {
-  StreamInvocationMessage(
-      {this.target,
-      this.arguments,
-      this.streamIds,
-      Map<String, String>? headers,
-      String? invocationId})
-      : super(
+  StreamInvocationMessage({
+    this.target,
+    this.arguments,
+    this.streamIds,
+    Map<String, String>? headers,
+    String? invocationId,
+  }) : super(
             type: MessageType.streamInvocation,
             headers: headers,
             invocationId: invocationId);
@@ -141,9 +144,11 @@ class StreamInvocationMessage extends HubInvocationMessage {
 
 /// A hub message representing a single item produced as part of a result stream.
 class StreamItemMessage extends HubInvocationMessage {
-  StreamItemMessage(
-      {this.item, Map<String, String>? headers, String? invocationId})
-      : super(
+  StreamItemMessage({
+    this.item,
+    Map<String, String>? headers,
+    String? invocationId,
+  }) : super(
             type: MessageType.streamItem,
             headers: headers,
             invocationId: invocationId);
@@ -154,12 +159,12 @@ class StreamItemMessage extends HubInvocationMessage {
 
 /// A hub message representing the result of an invocation.
 class CompletionMessage extends HubInvocationMessage with EquatableMixin {
-  CompletionMessage(
-      {this.error,
-      this.result,
-      Map<String, String>? headers,
-      String? invocationId})
-      : super(
+  CompletionMessage({
+    this.error,
+    this.result,
+    Map<String, String>? headers,
+    String? invocationId,
+  }) : super(
             type: MessageType.completion,
             headers: headers,
             invocationId: invocationId);

@@ -14,6 +14,7 @@ class ServerSentEventsTransport implements Transport {
   final bool? _withCredentials;
   String? _url;
   SseChannel? _sseChannel;
+  StreamSubscription? _sseStreamSubscription;
 
   ServerSentEventsTransport({
     BaseClient? client,
@@ -26,15 +27,15 @@ class ServerSentEventsTransport implements Transport {
         _log = logging,
         _logMessageContent = logMessageContent,
         _withCredentials = withCredentials {
-    onclose = null;
-    onreceive = null;
+    onClose = null;
+    onReceive = null;
   }
 
   @override
-  OnClose? onclose;
+  OnClose? onClose;
 
   @override
-  OnReceive? onreceive;
+  OnReceive? onReceive;
 
   @override
   Future<void> connect(String? url, TransferFormat? transferFormat) async {
@@ -58,7 +59,8 @@ class ServerSentEventsTransport implements Transport {
     if (transferFormat != TransferFormat.text) {
       return completer.completeError(
         Exception(
-            'The Server-Sent Events transport only supports the \'Text\' transfer format'),
+          'The Server-Sent Events transport only supports the \'Text\' transfer format',
+        ),
       );
     }
 
@@ -73,17 +75,27 @@ class ServerSentEventsTransport implements Transport {
       return completer.completeError(e);
     }
 
-    _sseChannel!.stream.listen((data) {
-      _log!(LogLevel.trace,
-          '(SSE transport) data received. ${getDataDetail(data, _logMessageContent)}');
-      onreceive!(data);
-    }, onError: (e) {
-      if (opened) {
-        _close(exception: e as Exception);
-      } else if (e is Object) {
-        completer.completeError(e);
-      }
-    });
+    _sseStreamSubscription = _sseChannel!.stream.listen(
+      (data) {
+        _log!(
+          LogLevel.trace,
+          '(SSE transport) data received. ${getDataDetail(data, _logMessageContent)}',
+        );
+        onReceive!(data);
+      },
+      onError: (e) {
+        _log!(
+          LogLevel.error,
+          '(SSE transport) error when listening to stream: $e',
+        );
+
+        if (opened) {
+          _close(exception: e as Exception);
+        } else if (e is Object) {
+          completer.completeError(e);
+        }
+      },
+    );
 
     return completer.future;
   }
@@ -92,7 +104,8 @@ class ServerSentEventsTransport implements Transport {
   Future<void> send(data) async {
     if (_sseChannel == null) {
       return Future.error(
-          Exception('Cannot send until the transport is connected'));
+        Exception('Cannot send until the transport is connected'),
+      );
     }
     return sendMessage(
       _log!,
@@ -108,16 +121,19 @@ class ServerSentEventsTransport implements Transport {
 
   @override
   Future<void> stop() {
+    _log!(LogLevel.trace, '(SSE transport) Disconnecting');
+
     _close();
     return Future.value(null);
   }
 
   void _close({Exception? exception}) {
     if (_sseChannel != null) {
+      _sseStreamSubscription?.cancel();
       _sseChannel = null;
 
-      if (onclose != null) {
-        onclose!(exception);
+      if (onClose != null) {
+        onClose!(exception);
       }
     }
   }

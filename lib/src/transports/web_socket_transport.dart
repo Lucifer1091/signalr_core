@@ -30,15 +30,15 @@ class WebSocketTransport implements Transport {
         _accessTokenFactory = accessTokenFactory,
         _logMessageContent = logMessageContent,
         _client = client {
-    onreceive = null;
-    onclose = null;
+    onReceive = null;
+    onClose = null;
   }
 
   @override
-  OnClose? onclose;
+  OnClose? onClose;
 
   @override
-  OnReceive? onreceive;
+  OnReceive? onReceive;
 
   @override
   Future<void> connect(String? url, TransferFormat? transferFormat) async {
@@ -51,7 +51,9 @@ class WebSocketTransport implements Transport {
       final token = await _accessTokenFactory!();
       if (token!.isNotEmpty) {
         final encodedToken = Uri.encodeComponent(token);
-        url = url! + (url.contains('?') ? '&' : '?') + 'access_token=$encodedToken';
+        url = url! +
+            (url.contains('?') ? '&' : '?') +
+            'access_token=$encodedToken';
       }
     }
 
@@ -69,9 +71,9 @@ class WebSocketTransport implements Transport {
       var dataDetail = getDataDetail(data, _logMessageContent);
       _logging!(
           LogLevel.trace, '(WebSockets transport) data received. $dataDetail');
-      if (onreceive != null) {
+      if (onReceive != null) {
         try {
-          onreceive!(data);
+          onReceive!(data);
         } on Exception catch (e1) {
           _close(e1);
           return;
@@ -122,17 +124,17 @@ class WebSocketTransport implements Transport {
     }
 
     _logging!(LogLevel.trace, '(WebSockets transport) socket closed.');
-    if (onclose != null) {
+    if (onClose != null) {
       if (error != null) {
-        onclose!(error);
+        onClose!(error);
       } else {
         if (closeCode != 0 && closeCode != 1000) {
-          onclose!(
+          onClose!(
             Exception(
                 'WebSocket closed with status code: $closeCode ($closeReason).'),
           );
         }
-        onclose!(null);
+        onClose!(null);
       }
     }
   }

@@ -25,7 +25,8 @@ class JsonHubProtocol implements HubProtocol {
     // Only JsonContent is allowed.
     if (!(input is String)) {
       throw Exception(
-          'Invalid input for JSON hub protocol. Expected a string.');
+        'Invalid input for JSON hub protocol. Expected a string.',
+      );
     }
 
     final jsonInput = input;
@@ -46,37 +47,31 @@ class JsonHubProtocol implements HubProtocol {
 
       switch (messageType) {
         case MessageType.invocation:
-          parsedMessage = InvocationMessageExtensions.fromJson(
-              jsonData);
+          parsedMessage = InvocationMessageExtensions.fromJson(jsonData);
           _isInvocationMessage(parsedMessage as InvocationMessage);
           break;
         case MessageType.streamItem:
-          parsedMessage = StreamItemMessageExtensions.fromJson(
-              jsonData);
+          parsedMessage = StreamItemMessageExtensions.fromJson(jsonData);
           _isStreamItemMessage(parsedMessage as StreamItemMessage);
           break;
         case MessageType.completion:
-          parsedMessage = CompletionMessageExtensions.fromJson(
-              jsonData);
+          parsedMessage = CompletionMessageExtensions.fromJson(jsonData);
           _isCompletionMessage(parsedMessage as CompletionMessage);
           break;
         case MessageType.ping:
-          parsedMessage =
-              PingMessageExtensions.fromJson(jsonData);
+          parsedMessage = PingMessageExtensions.fromJson(jsonData);
           // Single value, no need to validate
           break;
         case MessageType.close:
-          parsedMessage =
-              CloseMessageExtensions.fromJson(jsonData);
+          parsedMessage = CloseMessageExtensions.fromJson(jsonData);
           // All optional values, no need to validate
           break;
         default:
           // Future protocol changes can add message types, old clients can ignore them
           logging!(
-              LogLevel.information,
-              'Unknown message type \'' +
-                  messageType.toString() +
-                  '\' ignored.');
+            LogLevel.information,
+            'Unknown message type \'' + messageType.toString() + '\' ignored.',
+          );
           continue;
       }
       hubMessages.add(parsedMessage);
@@ -143,17 +138,23 @@ class JsonHubProtocol implements HubProtocol {
 
   void _isInvocationMessage(InvocationMessage message) {
     _assertNotEmptyString(
-        message.target, 'Invalid payload for Invocation message.');
+      message.target,
+      'Invalid payload for Invocation message.',
+    );
 
     if (message.invocationId != null) {
       _assertNotEmptyString(
-          message.target, 'Invalid payload for Invocation message.');
+        message.target,
+        'Invalid payload for Invocation message.',
+      );
     }
   }
 
   void _isStreamItemMessage(StreamItemMessage message) {
     _assertNotEmptyString(
-        message.invocationId, 'Invalid payload for StreamItem message.');
+      message.invocationId,
+      'Invalid payload for StreamItem message.',
+    );
 
     if (message.item == null) {
       throw Exception('Invalid payload for StreamItem message.');
@@ -163,11 +164,15 @@ class JsonHubProtocol implements HubProtocol {
   void _isCompletionMessage(CompletionMessage message) {
     if ((message.result == null) && (message.error != null)) {
       _assertNotEmptyString(
-          message.error, 'Invalid payload for Completion message.');
+        message.error,
+        'Invalid payload for Completion message.',
+      );
     }
 
     _assertNotEmptyString(
-        message.invocationId, 'Invalid payload for Completion message.');
+      message.invocationId,
+      'Invalid payload for Completion message.',
+    );
   }
 
   void _assertNotEmptyString(dynamic value, String errorMessage) {
@@ -264,9 +269,7 @@ extension PingMessageExtensions on PingMessage {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'type': type.value,
-    };
+    return {'type': type.value};
   }
 }
 
@@ -276,9 +279,6 @@ extension CloseMessageExtensions on CloseMessage {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'type': type.value,
-      'error': error,
-    };
+    return {'type': type.value, 'error': error};
   }
 }

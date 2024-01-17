@@ -27,15 +27,15 @@ class LongPollingTransport implements Transport {
         _logMessageContent = logMessageContent,
         _withCredentials = withCredentials {
     _running = false;
-    onreceive = null;
-    onclose = null;
+    onReceive = null;
+    onClose = null;
   }
 
   @override
-  OnClose? onclose;
+  OnClose? onClose;
 
   @override
-  OnReceive? onreceive;
+  OnReceive? onReceive;
 
   @override
   Future<void> connect(String? url, TransferFormat? transferFormat) async {
@@ -118,8 +118,8 @@ class LongPollingTransport implements Transport {
             _log?.call(LogLevel.trace,
                 '(LongPolling transport) data received. ${getDataDetail(response.body, _logMessageContent)}.');
 
-            if (onreceive != null) {
-              onreceive!(response.body);
+            if (onReceive != null) {
+              onReceive!(response.body);
             }
           } else {
             // This is another way timeout manifest.
@@ -132,7 +132,7 @@ class LongPollingTransport implements Transport {
       if (!_running) {
         // Log but disregard errors that occur after stopping
         _log?.call(LogLevel.trace,
-            '(LongPolling transport) Poll errored after shutdown: $e');
+            '(LongPolling transport) Poll error after shutdown: $e');
       } else {
         if (e is TimeoutException) {
           // Ignore timeouts and reissue the poll.
@@ -211,13 +211,13 @@ class LongPollingTransport implements Transport {
   }
 
   void _raiseOnClose() {
-    if (onclose != null) {
-      var logMessage = '(LongPolling transport) Firing onclose event.';
+    if (onClose != null) {
+      var logMessage = '(LongPolling transport) Firing onClose event.';
       if (_closeError != null) {
         logMessage += ' Error: ' + _closeError.toString();
       }
       _log?.call(LogLevel.trace, logMessage);
-      onclose!(_closeError);
+      onClose!(_closeError);
     }
   }
 }

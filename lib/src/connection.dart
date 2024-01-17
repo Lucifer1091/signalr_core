@@ -13,9 +13,9 @@ abstract class Connection {
 
   String? baseUrl;
 
-  OnReceive? onreceive;
+  OnReceive? onReceive;
 
-  OnClose? onclose;
+  OnClose? onClose;
 
   Future<void> start({
     transfer.TransferFormat? transferFormat = transfer.TransferFormat.binary,

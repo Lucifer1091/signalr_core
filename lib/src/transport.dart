@@ -71,6 +71,6 @@ abstract class Transport {
   Future<void> connect(String? url, TransferFormat? transferFormat);
   Future<void> send(dynamic data);
   Future<void> stop();
-  OnReceive? onreceive;
-  OnClose? onclose;
+  OnReceive? onReceive;
+  OnClose? onClose;
 }
