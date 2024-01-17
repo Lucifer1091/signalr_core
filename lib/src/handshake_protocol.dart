@@ -45,8 +45,7 @@ class HandshakeProtocol {
     return TextMessageFormat.write(json.encode(handshakeRequest.toJson()));
   }
 
-  Tuple2<dynamic, HandshakeResponseMessage> parseHandshakeResponse(
-      dynamic data) {
+  Tuple2<dynamic, HandshakeResponseMessage> parseHandshakeResponse(data) {
     HandshakeResponseMessage _responseMessage;
     String _messageData;
     dynamic _remainingData;

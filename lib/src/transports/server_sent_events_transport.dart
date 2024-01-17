@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:http/http.dart';
 import 'package:signalr_core/src/logger.dart';
+import 'package:signalr_core/src/sse_channel/src/channel.dart';
 import 'package:signalr_core/src/transport.dart';
 import 'package:signalr_core/src/utils.dart';
-import 'package:sse_channel/sse_channel.dart';
 
 class ServerSentEventsTransport implements Transport {
   final BaseClient? _client;

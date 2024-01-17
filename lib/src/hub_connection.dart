@@ -798,7 +798,7 @@ class HubConnection {
     dynamic remainingData;
 
     try {
-      var response = _handshakeProtocol.parseHandshakeResponse(data);
+      var response = _handshakeProtocol.parseHandshakeResponse(data ?? '{}');
       remainingData = response.item1;
       responseMessage = response.item2;
     } catch (e) {

@@ -6,7 +6,7 @@ import 'package:signalr_core/signalr_core.dart';
 Future<void> main(List<String> arguments) async {
   final connection = HubConnectionBuilder()
       .withUrl(
-        'http://localhost:5000/chatHub',
+        'https://cronytmstest.azurewebsites.net/connect?token=44e4e105-ff7c-4800-b0d4-a1da95272789',
         HttpConnectionOptions(
           client: IOClient(
             HttpClient()..badCertificateCallback = (x, y, z) => true,
