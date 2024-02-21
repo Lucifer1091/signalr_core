@@ -274,7 +274,7 @@ class HttpConnection implements Connection {
           'HttpConnection.stopConnection(${_exception.toString()}) was called while the connection is still in the connecting state.');
     }
 
-    if (_connectionState == ConnectionState.disconnecting) {
+    if (!_stopCompleter.isCompleted) {
       // A call to stop() induced this call to stopConnection and needs to be completed.
       // Any stop() awaits will be scheduled to continue after the onClose callback fires.
       _stopCompleter.complete();
