@@ -8,5 +8,7 @@ import '_connect_api.dart'
     if (dart.library.io) '_connect_io.dart' as platform;
 
 abstract class SseChannel extends StreamChannelMixin {
+  SseChannel();
+
   factory SseChannel.connect(Uri url) => platform.connect(url);
 }
